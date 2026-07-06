@@ -1,6 +1,4 @@
 {
-  "usingComponents": {
-    "van-button": "@vant/weapp/button/index"
-  },
+  "usingComponents": {},
   "navigationBarTitleText": "抽取塔罗牌"
 }

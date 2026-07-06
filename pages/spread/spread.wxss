@@ -91,12 +91,7 @@
 
 .actions {
   width: 100%;
-}
-
-.confirm-btn {
-  margin-bottom: 20rpx;
-}
-
-.back-btn {
-  color: var(--color-text-light);
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
 }

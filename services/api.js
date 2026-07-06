@@ -1,46 +1,100 @@
 // Coze Workflow API 封装
-// 文档: https://www.coze.com/docs/developer_guides/workflow_api
+// 文档: https://docs.coze.cn/developer_guides/workflow_run
+// 版本: v1
 
-const COZE_CONFIG = {
-  baseUrl: 'https://api.coze.cn/v3/workflow/run',
-  // ⚠️ Token 不要硬编码在代码中，上线前替换为安全存储方案
-  token: 'YOUR_COZE_API_TOKEN',
-  workflowId: 'YOUR_WORKFLOW_ID',
-  timeout: 60000 // Coze workflow 可能需要较长时间
+// 尝试加载本地配置，不存在则使用占位值
+var localConfig = {}
+try {
+  localConfig = require('./config.local.js')
+} catch (e) {
+  // config.local.js 不存在，使用占位值
+}
+
+var COZE_CONFIG = {
+  baseUrl: 'https://api.coze.cn/v1/workflow/run',
+  token: localConfig.token || 'YOUR_COZE_TOKEN',
+  workflowId: localConfig.workflowId || 'YOUR_WORKFLOW_ID'
 }
 
 /**
- * 通用 Coze Workflow 请求
- * @param {Object} params - workflow 参数
- * @returns {Promise<Object>}
+ * 递归清理对象所有字符串值中的转义字符
  */
-function cozeRequest(params) {
-  return new Promise((resolve, reject) => {
+function unescapeStrings(obj) {
+  if (typeof obj === 'string') {
+    return obj.replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\r/g, '\r')
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(function(item) { return unescapeStrings(item) })
+  }
+  if (obj && typeof obj === 'object') {
+    var cleaned = {}
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        cleaned[key] = unescapeStrings(obj[key])
+      }
+    }
+    return cleaned
+  }
+  return obj
+}
+
+/**
+ * 执行 Coze Workflow
+ * @param {Object} params - 工作流入参
+ * @returns {Promise<Object>} 解析后的 data
+ */
+function runWorkflow(params) {
+  return new Promise(function(resolve, reject) {
     wx.request({
       url: COZE_CONFIG.baseUrl,
       method: 'POST',
-      timeout: COZE_CONFIG.timeout,
+      timeout: 90000,
       header: {
-        'Authorization': `Bearer ${COZE_CONFIG.token}`,
+        'Authorization': 'Bearer ' + COZE_CONFIG.token,
         'Content-Type': 'application/json'
       },
       data: {
         workflow_id: COZE_CONFIG.workflowId,
         parameters: params
       },
-      success: (res) => {
+      success: function(res) {
+        // Coze 返回: { code: 0, data: "{\"output\":\"...\"}", msg: "" }
         if (res.statusCode === 200 && res.data) {
-          // Coze API 返回格式: { code: 0, data: {...}, msg: "success" }
-          if (res.data.code === 0) {
-            resolve(res.data.data)
+          var body = res.data
+          if (body.code === 0) {
+            try {
+              // 第一层解析: data 是 JSON 字符串，解开得到 { output: "..." }
+              var first = typeof body.data === 'string'
+                ? JSON.parse(body.data)
+                : body.data
+
+              // 第二层解析: output 是 workflow 的实际输出字符串
+              var output = first.output
+              if (output && typeof output === 'string') {
+                try {
+                  // output 可能是 JSON 字符串，解析后清理转义
+                  var result = JSON.parse(output)
+                  result = unescapeStrings(result)
+                  resolve(result)
+                } catch (e2) {
+                  // output 是纯文本，清理转义后返回
+                  resolve({ output: unescapeStrings(output) })
+                }
+              } else {
+                // 没有 output 字段，返回第一层结果
+                resolve(first)
+              }
+            } catch (e) {
+              resolve(body.data)
+            }
           } else {
-            reject(new Error(res.data.msg || 'Coze API 返回错误'))
+            reject(new Error(body.msg || 'Coze 错误码: ' + body.code))
           }
         } else {
-          reject(new Error(`HTTP ${res.statusCode}`))
+          reject(new Error('HTTP ' + res.statusCode))
         }
       },
-      fail: (err) => {
+      fail: function(err) {
         console.error('Coze API 请求失败:', err)
         reject(err)
       }
@@ -49,32 +103,44 @@ function cozeRequest(params) {
 }
 
 /**
- * 塔罗占卜
- * @param {Object} input - 用户输入
- * @param {string} input.birthday - 生日
- * @param {string} input.gender - 性别
- * @param {string} input.birthCity - 出生城市
- * @param {string} input.question - 占卜问题
- * @param {string} input.spreadId - 牌阵 ID
- * @param {string} input.spreadName - 牌阵名称
- * @param {number[]} input.cards - 抽到的牌 ID 数组
- * @param {Object[]} input.positions - 牌与位置的对应
- * @returns {Promise<Object>} { interpretations: [...], summary: "..." }
+ * 第一步：发送用户信息，获取牌阵推荐
+ * @param {Object} input
+ * @param {string} input.birthday - 生日 "YYYY-MM-DD"
+ * @param {string} input.sex      - 性别 "男" | "女"
+ * @param {string} input.city     - 出生城市
+ * @param {string} input.query    - 占卜问题
+ * @returns {Promise<Object>} workflow 原始返回
  */
-function tarotDivination(input) {
-  return cozeRequest({
+function matchSpread(input) {
+  return runWorkflow({
     birthday: input.birthday,
-    gender: input.gender,
-    birth_city: input.birthCity,
-    question: input.question,
-    spread_id: input.spreadId,
-    spread_name: input.spreadName,
-    cards: input.cards,
-    positions: input.positions
+    city: input.city,
+    sex: input.sex,
+    query: input.query
+  })
+}
+
+/**
+ * 第二步：发送完整占卜信息，获取 AI 解读
+ * @param {string} input.birthday - 生日
+ * @param {string} input.sex      - 性别
+ * @param {string} input.city     - 出生城市
+ * @param {string} input.query    - 占卜问题
+ * @param {number} input.num      - 抽取的塔罗牌数量
+ * @returns {Promise<Object>} workflow 原始返回
+ */
+function getReading(input) {
+  return runWorkflow({
+    birthday: input.birthday,
+    city: input.city,
+    sex: input.sex,
+    query: input.query,
+    num: input.num
   })
 }
 
 module.exports = {
-  tarotDivination,
-  cozeRequest
+  runWorkflow: runWorkflow,
+  matchSpread: matchSpread,
+  getReading: getReading
 }

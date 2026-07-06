@@ -2,70 +2,69 @@
   <view class="form-card">
     <view class="form-title">✨ 请填写信息，开始你的塔罗之旅</view>
 
-    <!-- 生日 -->
-    <view class="form-item" bindtap="onBirthdayTap">
+    <!-- 出生日期 - 原生 picker -->
+    <view class="form-item">
       <text class="form-label">📅 出生日期</text>
-      <view class="form-value {{birthday ? '' : 'placeholder'}}">
-        {{birthday || '请选择出生日期'}}
-      </view>
+      <picker
+        mode="date"
+        value="{{birthday}}"
+        start="1900-01-01"
+        end="{{today}}"
+        bindchange="onBirthdayChange"
+      >
+        <view class="form-value {{birthday ? '' : 'placeholder'}}">
+          {{birthday || '请选择出生日期'}}
+        </view>
+      </picker>
     </view>
-    <van-popup show="{{ showBirthday }}" position="bottom" bind:close="onBirthdayClose">
-      <van-datetime-picker
-        type="date"
-        value="{{ currentDate }}"
-        min-date="{{ minDate }}"
-        max-date="{{ maxDate }}"
-        bind:confirm="onBirthdayConfirm"
-        bind:cancel="onBirthdayClose"
-      />
-    </van-popup>
 
-    <!-- 性别 -->
+    <!-- 性别 - 原生 picker -->
     <view class="form-item">
       <text class="form-label">⚤ 性别</text>
-      <van-radio-group value="{{ gender }}" bind:change="onGenderChange" direction="horizontal">
-        <van-radio name="male" custom-class="radio-item">男</van-radio>
-        <van-radio name="female" custom-class="radio-item">女</van-radio>
-      </van-radio-group>
+      <picker
+        mode="selector"
+        range="{{genderOptions}}"
+        value="{{genderIndex}}"
+        bindchange="onGenderChange"
+      >
+        <view class="form-value {{gender ? '' : 'placeholder'}}">
+          {{gender || '请选择性别'}}
+        </view>
+      </picker>
     </view>
 
     <!-- 出生城市 -->
     <view class="form-item">
       <text class="form-label">🏙 出生城市</text>
-      <van-field
-        value="{{ birthCity }}"
+      <input
+        class="form-input"
+        value="{{birthCity}}"
         placeholder="请输入出生城市，如：北京"
-        bind:change="onCityChange"
-        border="{{ false }}"
-        custom-class="city-field"
+        bindinput="onCityInput"
       />
     </view>
 
     <!-- 占卜问题 -->
     <view class="form-item">
-      <text class="form-label">🔮 你想要占卜的问题</text>
-      <van-field
-        value="{{ question }}"
-        type="textarea"
+      <text class="form-label">🔮 你想占卜的问题</text>
+      <textarea
+        class="form-textarea"
+        value="{{question}}"
         placeholder="例如：我最近三个月的感情运势如何？"
-        autosize
         maxlength="200"
-        bind:change="onQuestionInput"
-        border="{{ false }}"
-        custom-class="question-field"
+        auto-height
+        bindinput="onQuestionInput"
       />
       <text class="char-count">{{question.length || 0}}/200</text>
     </view>
   </view>
 
-  <van-button
-    type="primary"
-    block
-    round
-    disabled="{{ !birthday || !gender || !question }}"
-    bind:click="onSubmit"
-    custom-class="submit-btn"
+  <!-- 提交按钮 -->
+  <button
+    class="submit-btn {{!birthday || !gender || !question ? 'disabled' : ''}}"
+    disabled="{{!birthday || !gender || !question}}"
+    bindtap="onSubmit"
   >
     开始占卜 ✨
-  </van-button>
+  </button>
 </view>

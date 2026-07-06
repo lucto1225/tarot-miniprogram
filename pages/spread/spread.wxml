@@ -24,11 +24,11 @@
   </view>
 
   <view class="actions" wx:if="{{!loading}}">
-    <van-button block round bind:click="onConfirm" custom-class="confirm-btn">
+    <button class="btn-primary btn-block" bindtap="onConfirm">
       确认牌阵，开始抽牌 ✨
-    </van-button>
-    <van-button block round plain bind:click="onBack" custom-class="back-btn">
+    </button>
+    <button class="btn-ghost btn-block" bindtap="onBack">
       返回修改信息
-    </van-button>
+    </button>
   </view>
 </view>

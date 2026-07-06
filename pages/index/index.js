@@ -53,20 +53,17 @@ Page({
   onStartReading() {
     const { userInfo } = this.data
     auth.setUserInfo(userInfo)
-    this.doLogin(userInfo)
-  },
 
-  async doLogin(userInfo) {
-    try {
-      const code = await auth.wxLogin()
-      const app = getApp()
+    const app = getApp()
+    app.globalData.userInfo = userInfo
+
+    // wx.login 异步获取 code（不阻塞页面跳转）
+    auth.wxLogin().then(code => {
       app.globalData.loginCode = code
-      app.globalData.userInfo = userInfo
+    }).catch(err => {
+      console.warn('wx.login 失败（非阻塞）:', err)
+    })
 
-      wx.navigateTo({ url: '/pages/input/input' })
-    } catch (err) {
-      console.error('登录失败:', err)
-      wx.showToast({ title: '登录失败，请重试', icon: 'none' })
-    }
+    wx.navigateTo({ url: '/pages/input/input' })
   }
 })

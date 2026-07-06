@@ -10,8 +10,11 @@ App({
       question: '',
       spreadId: null,
       spreadName: '',
+      spreadCardCount: 0,
+      spreadPositions: [],
       cards: [],
-      result: null
+      result: null,
+      workflowSpread: null
     }
   },
 

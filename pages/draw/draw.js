@@ -1,62 +1,89 @@
-const app = getApp()
-const cardsData = require('../../data/cards.js')
-const spreads = require('../../data/spreads.js')
+var app = getApp()
+var cardsData = require('../../data/cards.js')
 
 Page({
   data: {
     spread: null,
     allCards: [],
     selectedCards: [],
-    isShuffling: false,
-    phase: 'shuffle' // shuffle | select | done
+    dotArray: [],
+    phase: 'shuffle'
   },
 
-  onLoad() {
-    const { spreadId } = app.globalData.reading
-    const spread = spreads.find(s => s.id === spreadId)
-    this.setData({ spread })
+  onLoad: function() {
+    var reading = app.globalData.reading
+    var spreadName = reading.spreadName || '通用牌阵'
+    var cardCount = reading.spreadCardCount || 3
 
-    // 初始化 78 张牌并洗牌
+    // 直接从 globalData 读取牌阵信息（兼容 workflow 和本地）
+    var spread = {
+      name: spreadName,
+      card_count: cardCount,
+      positions: reading.spreadPositions || []
+    }
+
+    var dotArray = []
+    for (var i = 0; i < cardCount; i++) {
+      dotArray.push(i)
+    }
+
+    this.setData({ spread: spread, dotArray: dotArray })
     this.shuffleCards()
   },
 
-  shuffleCards() {
+  shuffleCards: function() {
     this.setData({ isShuffling: true, selectedCards: [], phase: 'shuffle' })
 
-    // Fisher-Yates 洗牌
-    const shuffled = [...cardsData]
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    var shuffled = cardsData.map(function(c) {
+      var copy = {}
+      for (var key in c) { copy[key] = c[key] }
+      copy.selected = false
+      return copy
+    })
+
+    for (var i = shuffled.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1))
+      var tmp = shuffled[i]
+      shuffled[i] = shuffled[j]
+      shuffled[j] = tmp
     }
 
-    setTimeout(() => {
-      this.setData({ allCards: shuffled, isShuffling: false, phase: 'select' })
-    }, 1000)
+    var self = this
+    setTimeout(function() {
+      self.setData({ allCards: shuffled, phase: 'select' })
+    }, 1200)
   },
 
-  onSelectCard(e) {
-    const { index } = e.currentTarget.dataset
-    const card = this.data.allCards[index]
+  onSelectCard: function(e) {
+    if (this.data.phase !== 'select') return
 
-    if (this.data.selectedCards.includes(card)) return
-    if (this.data.selectedCards.length >= this.data.spread.card_count) return
+    var index = e.currentTarget.dataset.index
+    var allCards = this.data.allCards
+    var card = allCards[index]
+    var maxCount = this.data.spread.card_count
 
-    const selectedCards = [...this.data.selectedCards, card]
-    this.setData({ selectedCards })
+    if (card.selected) return
+    if (this.data.selectedCards.length >= maxCount) return
 
-    if (selectedCards.length === this.data.spread.card_count) {
+    allCards[index] = Object.assign({}, card, { selected: true })
+    var selectedCards = this.data.selectedCards.concat(card)
+
+    this.setData({ allCards: allCards, selectedCards: selectedCards })
+
+    wx.vibrateShort({ type: 'light' })
+
+    if (selectedCards.length === maxCount) {
       this.setData({ phase: 'done' })
+      app.globalData.reading.cards = selectedCards.map(function(c) { return c.id })
 
-      app.globalData.reading.cards = selectedCards.map(c => c.id)
-
-      setTimeout(() => {
+      var self = this
+      setTimeout(function() {
         wx.navigateTo({ url: '/pages/result/result' })
-      }, 800)
+      }, 1000)
     }
   },
 
-  onReshuffle() {
+  onReshuffle: function() {
     this.shuffleCards()
   }
 })

@@ -51,6 +51,10 @@ prisma/*.db-journal
 miniprogram_npm/
 project.private.config.json
 
+# local secrets (API tokens, workflow IDs)
+*.local.js
+!config.example.js
+
 # database
 *.db
 *.db-journal

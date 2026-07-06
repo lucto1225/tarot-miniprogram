@@ -1,46 +1,57 @@
 <view class="container">
   <!-- 加载中 -->
   <view class="loading-area" wx:if="{{loading}}">
+    <view class="loading-spinner"></view>
     <view class="loading-icon">🔮</view>
-    <van-loading type="spinner" color="#c9a84c" size="48rpx" />
     <text class="loading-text">正在连接宇宙能量，为你解读...</text>
   </view>
 
   <!-- 结果 -->
   <view class="result-area" wx:if="{{!loading && reading}}">
-    <!-- 牌阵结果 -->
-    <view class="cards-row">
-      <view class="result-card" wx:for="{{positions}}" wx:key="index">
-        <view class="card-position">{{item.name}}</view>
-        <view class="card-name">{{item.card.name_zh}}</view>
-        <view class="card-keywords">{{item.card.keywords.join(' · ')}}</view>
+    <!-- 牌阵标题 -->
+    <view class="section-header">🃏 你的牌阵</view>
+
+    <!-- 卡牌展示 -->
+    <view class="cards-row" wx:if="{{positions.length}}">
+      <view class="card-display" wx:for="{{positions}}" wx:key="index" wx:if="{{item.card}}">
+        <!-- 牌面图片 -->
+        <image class="card-image" src="{{item.card.imageUrl}}" mode="aspectFill" />
+        <!-- 牌名 -->
+        <view class="card-zh">{{item.card.name_zh}}</view>
+        <view class="card-en">{{item.card.name_en}}</view>
+        <!-- 位置标签 -->
+        <view class="card-pos-tag">{{item.name}}</view>
+        <!-- 含义 -->
+        <view class="card-meaning">{{item.card.meaning_upright || ''}}</view>
       </view>
     </view>
 
-    <!-- AI 解读 -->
-    <view class="reading-section" wx:for="{{reading.interpretations}}" wx:key="position">
-      <view class="reading-title">
-        <text class="position-badge">{{item.position}}</text>
-        <text>{{item.card_name}}</text>
+    <!-- 逐牌解读 -->
+    <block wx:if="{{reading.interpretations}}">
+      <view class="reading-section" wx:for="{{reading.interpretations}}" wx:key="position" wx:for-item="interp">
+        <view class="reading-title">
+          <text class="position-badge">{{interp.position}}</text>
+          <text>{{interp.card_name}}</text>
+        </view>
+        <rich-text nodes="{{interp.interpretationHtml}}" class="reading-content"></rich-text>
       </view>
-      <view class="reading-content">{{item.interpretation}}</view>
-    </view>
+    </block>
 
     <!-- 总结 -->
-    <view class="summary-section">
+    <view class="summary-section" wx:if="{{reading.summaryHtml}}">
       <view class="summary-title">🌟 综合分析</view>
-      <view class="summary-content">{{reading.summary}}</view>
+      <rich-text nodes="{{reading.summaryHtml}}" class="summary-content"></rich-text>
     </view>
   </view>
 
-  <!-- 空结果（API 失败时的 fallback） -->
+  <!-- 错误 -->
   <view class="fallback-area" wx:if="{{!loading && !reading}}">
     <view class="fallback-icon">😔</view>
     <view class="fallback-text">解读服务暂时不可用</view>
-    <view class="fallback-hint">请稍后重试</view>
+    <view class="fallback-hint">{{errorMsg || '请稍后重试'}}</view>
   </view>
 
-  <van-button block round bind:click="onRestart" custom-class="restart-btn" wx:if="{{!loading}}">
+  <button class="btn-primary btn-block" bindtap="onRestart" wx:if="{{!loading}}">
     重新占卜 🔮
-  </van-button>
+  </button>
 </view>

@@ -1,46 +1,79 @@
 <view class="container">
-  <!-- 进度提示 -->
-  <view class="progress-bar">
-    <view class="progress-text">
-      已选 {{selectedCards.length}} / {{spread.card_count}} 张
+  <!-- 顶部提示 -->
+  <view class="header-bar">
+    <view class="spread-badge">{{spread.name}}</view>
+    <view class="instruction" wx:if="{{phase === 'select'}}">
+      凭直觉选择 {{spread.card_count}} 张牌
     </view>
-    <view class="progress-track">
-      <view class="progress-fill" style="width: {{selectedCards.length / spread.card_count * 100}}%"></view>
+  </view>
+
+  <!-- 进度 -->
+  <view class="progress-section">
+    <view class="progress-dots">
+      <view
+        class="dot {{index < selectedCards.length ? 'filled' : ''}}"
+        wx:for="{{dotArray}}"
+        wx:key="*this"
+      ></view>
     </view>
+    <view class="progress-label">{{selectedCards.length}} / {{spread.card_count}}</view>
   </view>
 
   <!-- 洗牌中 -->
   <view class="shuffle-area" wx:if="{{phase === 'shuffle'}}">
     <view class="shuffle-animation">
-      <text class="shuffle-icon">🃏</text>
+      <view class="shuffle-cards">
+        <view class="flying-card c1">🃏</view>
+        <view class="flying-card c2">🃏</view>
+        <view class="flying-card c3">🃏</view>
+      </view>
       <text class="shuffle-text">洗牌中...</text>
+      <text class="shuffle-sub">与宇宙能量连接</text>
     </view>
   </view>
 
-  <!-- 选牌阶段 -->
-  <view class="cards-grid" wx:if="{{phase === 'select' || phase === 'done'}}">
-    <view
-      class="card-item {{selectedCards.includes(item) ? 'selected' : ''}}"
-      wx:for="{{allCards}}"
-      wx:key="id"
-      data-index="{{index}}"
-      bindtap="onSelectCard"
-    >
-      <view class="card-back">
-        <text class="card-star">★</text>
+  <!-- 选牌网格 -->
+  <scroll-view class="cards-scroll" scroll-y wx:if="{{phase === 'select' || phase === 'done'}}">
+    <view class="cards-grid">
+      <view
+        class="card-item {{item.selected ? 'selected' : ''}}"
+        wx:for="{{allCards}}"
+        wx:key="id"
+        data-index="{{index}}"
+        bindtap="onSelectCard"
+      >
+        <view class="card-back-inner">
+          <view class="card-pattern-top">✦</view>
+          <view class="card-pattern-mid">★</view>
+          <view class="card-pattern-bot">✦</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 已选牌预览 -->
+  <view class="selected-preview" wx:if="{{selectedCards.length > 0 && phase !== 'shuffle'}}">
+    <view class="preview-title">已选中的牌</view>
+    <view class="preview-cards">
+      <view class="preview-card" wx:for="{{selectedCards}}" wx:key="id">
+        <view class="preview-card-name">{{item.name_zh}}</view>
       </view>
     </view>
   </view>
 
-  <!-- 选完 -->
-  <view class="done-hint" wx:if="{{phase === 'done'}}">
-    <text>✨ 牌已选好，正在解读...</text>
+  <!-- 完成蒙层 -->
+  <view class="done-overlay" wx:if="{{phase === 'done'}}">
+    <view class="done-content">
+      <text class="done-icon">✨</text>
+      <text class="done-text">牌已选好</text>
+      <text class="done-sub">正在解读...</text>
+    </view>
   </view>
 
-  <!-- 重新洗牌 -->
-  <view class="reshuffle-btn" wx:if="{{phase === 'select'}}">
-    <van-button plain round size="small" bind:click="onReshuffle">
+  <!-- 底部按钮 -->
+  <view class="bottom-actions" wx:if="{{phase === 'select'}}">
+    <button class="btn-ghost btn-small" bindtap="onReshuffle">
       🔄 重新洗牌
-    </van-button>
+    </button>
   </view>
 </view>
