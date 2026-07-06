@@ -1,0 +1,111 @@
+.container {
+  min-height: 100vh;
+  padding: 32rpx;
+  background: var(--color-bg-dark);
+}
+
+.progress-bar {
+  margin-bottom: 32rpx;
+}
+
+.progress-text {
+  color: #ccc;
+  font-size: var(--font-sm);
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8rpx;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-accent));
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+.shuffle-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.shuffle-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: pulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(1.08); opacity: 1; }
+}
+
+.shuffle-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.shuffle-text {
+  color: var(--color-accent);
+  font-size: var(--font-lg);
+}
+
+.cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card-item {
+  width: 80rpx;
+  height: 120rpx;
+  margin: 8rpx;
+  background: linear-gradient(135deg, #1a1a3e, #2d1b4e);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.card-item.selected {
+  transform: scale(1.1);
+  border: 3rpx solid var(--color-accent);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.card-star {
+  color: rgba(201, 168, 76, 0.3);
+  font-size: 28rpx;
+}
+
+.done-hint {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-accent);
+  font-size: var(--font-lg);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reshuffle-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 48rpx;
+}

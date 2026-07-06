@@ -1,0 +1,46 @@
+<view class="container">
+  <!-- 加载中 -->
+  <view class="loading-area" wx:if="{{loading}}">
+    <view class="loading-icon">🔮</view>
+    <van-loading type="spinner" color="#c9a84c" size="48rpx" />
+    <text class="loading-text">正在连接宇宙能量，为你解读...</text>
+  </view>
+
+  <!-- 结果 -->
+  <view class="result-area" wx:if="{{!loading && reading}}">
+    <!-- 牌阵结果 -->
+    <view class="cards-row">
+      <view class="result-card" wx:for="{{positions}}" wx:key="index">
+        <view class="card-position">{{item.name}}</view>
+        <view class="card-name">{{item.card.name_zh}}</view>
+        <view class="card-keywords">{{item.card.keywords.join(' · ')}}</view>
+      </view>
+    </view>
+
+    <!-- AI 解读 -->
+    <view class="reading-section" wx:for="{{reading.interpretations}}" wx:key="position">
+      <view class="reading-title">
+        <text class="position-badge">{{item.position}}</text>
+        <text>{{item.card_name}}</text>
+      </view>
+      <view class="reading-content">{{item.interpretation}}</view>
+    </view>
+
+    <!-- 总结 -->
+    <view class="summary-section">
+      <view class="summary-title">🌟 综合分析</view>
+      <view class="summary-content">{{reading.summary}}</view>
+    </view>
+  </view>
+
+  <!-- 空结果（API 失败时的 fallback） -->
+  <view class="fallback-area" wx:if="{{!loading && !reading}}">
+    <view class="fallback-icon">😔</view>
+    <view class="fallback-text">解读服务暂时不可用</view>
+    <view class="fallback-hint">请稍后重试</view>
+  </view>
+
+  <van-button block round bind:click="onRestart" custom-class="restart-btn" wx:if="{{!loading}}">
+    重新占卜 🔮
+  </van-button>
+</view>

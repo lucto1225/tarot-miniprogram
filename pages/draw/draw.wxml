@@ -1,0 +1,46 @@
+<view class="container">
+  <!-- 进度提示 -->
+  <view class="progress-bar">
+    <view class="progress-text">
+      已选 {{selectedCards.length}} / {{spread.card_count}} 张
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{selectedCards.length / spread.card_count * 100}}%"></view>
+    </view>
+  </view>
+
+  <!-- 洗牌中 -->
+  <view class="shuffle-area" wx:if="{{phase === 'shuffle'}}">
+    <view class="shuffle-animation">
+      <text class="shuffle-icon">🃏</text>
+      <text class="shuffle-text">洗牌中...</text>
+    </view>
+  </view>
+
+  <!-- 选牌阶段 -->
+  <view class="cards-grid" wx:if="{{phase === 'select' || phase === 'done'}}">
+    <view
+      class="card-item {{selectedCards.includes(item) ? 'selected' : ''}}"
+      wx:for="{{allCards}}"
+      wx:key="id"
+      data-index="{{index}}"
+      bindtap="onSelectCard"
+    >
+      <view class="card-back">
+        <text class="card-star">★</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 选完 -->
+  <view class="done-hint" wx:if="{{phase === 'done'}}">
+    <text>✨ 牌已选好，正在解读...</text>
+  </view>
+
+  <!-- 重新洗牌 -->
+  <view class="reshuffle-btn" wx:if="{{phase === 'select'}}">
+    <van-button plain round size="small" bind:click="onReshuffle">
+      🔄 重新洗牌
+    </van-button>
+  </view>
+</view>

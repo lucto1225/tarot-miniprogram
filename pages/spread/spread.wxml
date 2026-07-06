@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="spread-card" wx:if="{{spread}}">
+    <view class="spread-icon">🔮</view>
+    <view class="spread-name">{{spread.name}}</view>
+    <view class="spread-desc">{{spread.description}}</view>
+
+    <view class="spread-detail">
+      <view class="detail-title">牌阵包含 {{spread.card_count}} 张牌</view>
+
+      <view class="positions">
+        <view class="position-item" wx:for="{{spread.positions}}" wx:key="index">
+          <view class="position-num">{{index + 1}}</view>
+          <view class="position-info">
+            <view class="position-name">{{item.name}}</view>
+            <view class="position-meaning">{{item.meaning}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="match-hint">
+      根据你的问题「{{question}}」，系统为你匹配了此牌阵
+    </view>
+  </view>
+
+  <view class="actions" wx:if="{{!loading}}">
+    <van-button block round bind:click="onConfirm" custom-class="confirm-btn">
+      确认牌阵，开始抽牌 ✨
+    </van-button>
+    <van-button block round plain bind:click="onBack" custom-class="back-btn">
+      返回修改信息
+    </van-button>
+  </view>
+</view>

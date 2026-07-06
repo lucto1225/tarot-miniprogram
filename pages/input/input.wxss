@@ -1,0 +1,70 @@
+.container {
+  min-height: 100vh;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-card {
+  width: 100%;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: 40rpx 32rpx;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 48rpx;
+}
+
+.form-title {
+  font-size: var(--font-lg);
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: 40rpx;
+  font-weight: 600;
+}
+
+.form-item {
+  margin-bottom: 36rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: var(--font-md);
+  color: var(--color-text);
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.form-value {
+  padding: 20rpx 24rpx;
+  background: #f8f4f0;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-md);
+}
+
+.form-value.placeholder {
+  color: var(--color-text-light);
+}
+
+.radio-item {
+  margin-right: 48rpx;
+}
+
+.city-field,
+.question-field {
+  background: #f8f4f0;
+  border-radius: var(--radius-sm);
+  padding: 20rpx 24rpx;
+}
+
+.char-count {
+  text-align: right;
+  font-size: var(--font-xs);
+  color: var(--color-text-light);
+  margin-top: 8rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 24rpx;
+}

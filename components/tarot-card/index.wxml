@@ -1,0 +1,19 @@
+<view class="tarot-card {{sizeClass}} {{revealed ? 'revealed' : 'hidden'}}">
+  <!-- 未翻开的牌背 -->
+  <view class="card-back" wx:if="{{!revealed}}">
+    <view class="card-pattern">
+      <text class="card-star">★</text>
+      <text class="card-label">TAROT</text>
+    </view>
+  </view>
+
+  <!-- 已翻开的牌面 -->
+  <view class="card-front" wx:if="{{revealed && card}}">
+    <view class="card-name">{{card.name_zh}}</view>
+    <view class="card-en">{{card.name_en}}</view>
+    <view class="card-keywords">
+      <text wx:for="{{card.keywords}}" wx:key="*this" wx:for-item="kw">{{kw}} </text>
+    </view>
+    <view class="card-position" wx:if="{{position}}">{{position}}</view>
+  </view>
+</view>

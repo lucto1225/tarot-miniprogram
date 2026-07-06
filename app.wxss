@@ -1,0 +1,40 @@
+/* 主题色变量 */
+page {
+  --color-primary: #6b3fa0;
+  --color-primary-light: #9b7fc4;
+  --color-accent: #c9a84c;
+  --color-bg: #f5e6d3;
+  --color-bg-dark: #1a1a2e;
+  --color-text: #2c2c2c;
+  --color-text-light: #6b6b6b;
+  --color-card-bg: #0d0d1a;
+  --color-white: #ffffff;
+
+  --font-xl: 36rpx;
+  --font-lg: 32rpx;
+  --font-md: 28rpx;
+  --font-sm: 24rpx;
+  --font-xs: 20rpx;
+
+  --radius-sm: 8rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+
+  --shadow-card: 0 4rpx 20rpx rgba(107, 63, 160, 0.3);
+
+  background-color: var(--color-bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--color-text);
+  font-size: var(--font-md);
+  line-height: 1.6;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 32rpx;
+  box-sizing: border-box;
+}

@@ -1,0 +1,54 @@
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- Logo 区 -->
+    <view class="logo-area">
+      <view class="logo-icon">🔮</view>
+      <view class="logo-title">塔罗占卜</view>
+      <view class="logo-subtitle">探索你的命运</view>
+    </view>
+
+    <!-- 用户信息区 -->
+    <view class="userinfo">
+      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+        </button>
+        <view class="nickname-wrapper">
+          <text class="nickname-label">昵称</text>
+          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
+        </view>
+        <button
+          class="start-btn"
+          disabled="{{!hasUserInfo}}"
+          bindtap="onStartReading"
+          wx:if="{{hasUserInfo}}"
+        >
+          进入占卜 ✨
+        </button>
+      </block>
+
+      <block wx:elif="{{!hasUserInfo}}">
+        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile" class="login-btn">
+          🃏 微信一键登录
+        </button>
+        <view wx:else class="version-tip">请更新微信版本以使用完整功能</view>
+      </block>
+
+      <!-- 已登录 -->
+      <block wx:else>
+        <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+        <text class="userinfo-nickname">{{userInfo.nickName}}，你好</text>
+        <button class="start-btn" bindtap="onStartReading">
+          开始占卜 🔮
+        </button>
+      </block>
+    </view>
+
+    <!-- 底部说明 -->
+    <view class="footer-tips">
+      <text class="tip-item">🌟 AI 塔罗牌阵分析</text>
+      <text class="tip-item">✨ 智能匹配专属牌阵</text>
+      <text class="tip-item">🔮 深度解读命运走向</text>
+    </view>
+  </view>
+</scroll-view>
