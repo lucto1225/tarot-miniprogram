@@ -8,7 +8,21 @@ Page({
     var y = today.getFullYear()
     var m = String(today.getMonth() + 1).padStart(2, '0')
     var d = String(today.getDate()).padStart(2, '0')
-    this.setData({ today: y + '-' + m + '-' + d })
+
+    // 恢复上次保存的信息
+    var saved = wx.getStorageSync('userProfile')
+    if (saved) {
+      var genderIndex = saved.gender === '女' ? 1 : 0
+      this.setData({
+        today: y + '-' + m + '-' + d,
+        birthday: saved.birthday || '',
+        gender: saved.gender || '',
+        genderIndex: genderIndex,
+        birthCity: saved.birthCity || ''
+      })
+    } else {
+      this.setData({ today: y + '-' + m + '-' + d })
+    }
   },
 
   data: {
@@ -79,7 +93,14 @@ Page({
     var num = matched.card_count
     util.log('本地匹配牌阵:', matched.name, '卡牌数:', num)
 
-    // 2. 保存到全局
+    // 2. 持久化用户信息
+    wx.setStorageSync('userProfile', {
+      birthday: birthday,
+      gender: gender,
+      birthCity: birthCity
+    })
+
+    // 3. 保存到全局
     app.globalData.reading = {
       birthday: birthday,
       gender: gender,
