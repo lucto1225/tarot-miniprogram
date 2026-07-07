@@ -140,7 +140,7 @@ function getReading(input) {
     sex: input.sex,
     query: input.query,
     num: input.num,
-    cards: input.cards
+    cards: JSON.stringify(input.cards)
   })
 }
 
