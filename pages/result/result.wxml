@@ -19,10 +19,13 @@
         <!-- 牌名 -->
         <view class="card-zh">{{item.card.name_zh}}</view>
         <view class="card-en">{{item.card.name_en}}</view>
-        <!-- 位置标签 -->
-        <view class="card-pos-tag">{{item.name}}</view>
+        <!-- 正逆位 + 位置 -->
+        <view class="card-tags">
+          <text class="tag-pos">{{item.name}}</text>
+          <text class="tag-reverse {{item.reversed ? 'reversed' : 'upright'}}">{{item.reversed ? '逆位' : '正位'}}</text>
+        </view>
         <!-- 含义 -->
-        <view class="card-meaning">{{item.card.meaning_upright || ''}}</view>
+        <view class="card-meaning">{{item.reversed && item.card.meaning_reversed ? item.card.meaning_reversed : item.card.meaning_upright}}</view>
       </view>
     </view>
 

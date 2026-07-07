@@ -47,18 +47,24 @@ Page({
     var cards = reading.cards || []
 
     for (var i = 0; i < cards.length; i++) {
-      var card = cardsData.find(function(c) { return c.id === cards[i] })
+      var cardItem = cards[i]
+      var cardId = typeof cardItem === 'object' ? cardItem.id : cardItem
+      var isReversed = typeof cardItem === 'object' ? cardItem.reversed : false
+      var card = cardsData.find(function(c) { return c.id === cardId })
       var pos = spreadPositions[i] || { name: '牌' + (i + 1), meaning: '' }
       positions.push({
         name: pos.name || ('牌' + (i + 1)),
         meaning: pos.meaning || '',
+        reversed: isReversed,
         card: card ? {
           id: card.id,
           name_zh: card.name_zh,
           name_en: card.name_en,
           keywordsStr: card.keywords ? card.keywords.join(' · ') : '',
           meaning_upright: card.meaning_upright || '',
-          imageUrl: getCardImage(card)
+          meaning_reversed: card.meaning_reversed || '',
+          imageUrl: getCardImage(card),
+          isReversed: isReversed
         } : null
       })
     }
@@ -72,14 +78,27 @@ Page({
     var reading = app.globalData.reading
     var cardCount = reading.cards ? reading.cards.length : (reading.spreadCardCount || 3)
 
+    // 构建用户抽到的牌数据
+    var cardsPayload = this.data.positions.map(function(p, i) {
+      return {
+        id: p.card ? p.card.id : null,
+        name_zh: p.card ? p.card.name_zh : '',
+        name_en: p.card ? p.card.name_en : '',
+        position: p.name,
+        position_meaning: p.meaning,
+        reversed: p.reversed || false
+      }
+    })
+
     api.getReading({
       birthday: reading.birthday,
       city: reading.birthCity,
       sex: reading.gender,
       query: reading.question,
-      num: cardCount
+      num: cardCount,
+      cards: cardsPayload
     }).then(function(res) {
-      console.log('workflow raw response:', JSON.stringify(res))
+      util.log('workflow raw response:', JSON.stringify(res))
 
       var readingData = {}
 
@@ -112,7 +131,7 @@ Page({
 
       self.setData({ reading: readingData, loading: false })
     }).catch(function(err) {
-      console.error('AI 解读失败:', err)
+      util.logError('AI 解读失败:', err)
       self.setData({
         loading: false,
         errorMsg: err.message || '网络请求失败'

@@ -1,5 +1,6 @@
 var app = getApp()
-var api = require('../../services/api.js')
+var spreads = require('../../data/spreads.js')
+var util = require('../../utils/util.js')
 
 Page({
   onLoad: function() {
@@ -21,12 +22,10 @@ Page({
     submitting: false
   },
 
-  // 生日
   onBirthdayChange: function(e) {
     this.setData({ birthday: e.detail.value })
   },
 
-  // 性别
   onGenderChange: function(e) {
     var index = parseInt(e.detail.value)
     this.setData({
@@ -35,58 +34,64 @@ Page({
     })
   },
 
-  // 城市
   onCityInput: function(e) {
     this.setData({ birthCity: e.detail.value })
   },
 
-  // 问题
   onQuestionInput: function(e) {
     this.setData({ question: e.detail.value })
   },
 
-  // 提交
+  // 本地关键词匹配牌阵
+  matchSpreadLocal: function(question) {
+    if (!question) return this.getFallback()
+    for (var i = 0; i < spreads.length; i++) {
+      var spread = spreads[i]
+      for (var j = 0; j < spread.suitable_for.length; j++) {
+        if (question.indexOf(spread.suitable_for[j]) !== -1) {
+          return spread
+        }
+      }
+    }
+    return this.getFallback()
+  },
+
+  getFallback: function() {
+    for (var k = 0; k < spreads.length; k++) {
+      if (spreads[k].id === 'golden_triangle') return spreads[k]
+    }
+    return spreads[spreads.length - 1]
+  },
+
   onSubmit: function() {
     var birthday = this.data.birthday
     var gender = this.data.gender
-    var question = this.data.question
+    var question = this.data.question.trim()
     var birthCity = this.data.birthCity || '未知'
 
-    if (!birthday || !gender || !question.trim()) {
+    if (!birthday || !gender || !question) {
       wx.showToast({ title: '请填写完整信息', icon: 'none' })
       return
     }
 
-    // 保存到全局
+    // 1. 本地匹配牌阵 → 确定 num
+    var matched = this.matchSpreadLocal(question)
+    var num = matched.card_count
+    util.log('本地匹配牌阵:', matched.name, '卡牌数:', num)
+
+    // 2. 保存到全局
     app.globalData.reading = {
       birthday: birthday,
       gender: gender,
       birthCity: birthCity,
-      question: question.trim()
+      question: question,
+      spreadId: matched.id,
+      spreadName: matched.name,
+      spreadCardCount: num,
+      spreadPositions: matched.positions
     }
 
-    // 显示加载，调用 workflow 匹配牌阵
-    this.setData({ submitting: true })
-    wx.showLoading({ title: '匹配牌阵中...', mask: true })
-
-    var self = this
-    api.matchSpread({
-      birthday: birthday,
-      city: birthCity,
-      sex: gender,
-      query: question.trim()
-    }).then(function(result) {
-      wx.hideLoading()
-      self.setData({ submitting: false })
-      // 将 workflow 返回的牌阵信息存入 globalData
-      app.globalData.reading.workflowSpread = result
-      wx.navigateTo({ url: '/pages/spread/spread' })
-    }).catch(function(err) {
-      wx.hideLoading()
-      self.setData({ submitting: false })
-      console.error('Workflow 调用失败，使用本地匹配:', err)
-      // 兜底：使用本地关键词匹配
-      wx.navigateTo({ url: '/pages/spread/spread' })
-    })
+    // 3. 跳转牌阵展示页（workflow 调用在抽牌完成后的结果页触发）
+    wx.navigateTo({ url: '/pages/spread/spread' })
   }
 })

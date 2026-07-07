@@ -2,6 +2,8 @@
 // 文档: https://docs.coze.cn/developer_guides/workflow_run
 // 版本: v1
 
+var util = require('../utils/util.js')
+
 // 尝试加载本地配置，不存在则使用占位值
 var localConfig = {}
 try {
@@ -95,7 +97,7 @@ function runWorkflow(params) {
         }
       },
       fail: function(err) {
-        console.error('Coze API 请求失败:', err)
+        util.logError('Coze API 请求失败:', err)
         reject(err)
       }
     })
@@ -116,7 +118,8 @@ function matchSpread(input) {
     birthday: input.birthday,
     city: input.city,
     sex: input.sex,
-    query: input.query
+    query: input.query,
+    num: input.num
   })
 }
 
@@ -127,6 +130,7 @@ function matchSpread(input) {
  * @param {string} input.city     - 出生城市
  * @param {string} input.query    - 占卜问题
  * @param {number} input.num      - 抽取的塔罗牌数量
+ * @param {Array}  input.cards    - 用户抽到的牌 [{id, name_zh, position}]
  * @returns {Promise<Object>} workflow 原始返回
  */
 function getReading(input) {
@@ -135,7 +139,8 @@ function getReading(input) {
     city: input.city,
     sex: input.sex,
     query: input.query,
-    num: input.num
+    num: input.num,
+    cards: input.cards
   })
 }
 

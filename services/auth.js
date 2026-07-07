@@ -1,6 +1,7 @@
 // 微信登录封装
 
-const app = getApp()
+var app = getApp()
+var util = require('../utils/util.js')
 
 /**
  * 微信登录 - 获取 code
@@ -17,7 +18,7 @@ function wxLogin() {
         }
       },
       fail: (err) => {
-        console.error('wx.login 失败:', err)
+        util.logError('wx.login 失败:', err)
         reject(err)
       }
     })

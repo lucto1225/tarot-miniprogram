@@ -1,4 +1,5 @@
-const auth = require('../../services/auth.js')
+var auth = require('../../services/auth.js')
+var util = require('../../utils/util.js')
 
 const defaultAvatarUrl = 'https://mmbiz.qpic.cn/mmbiz/icTdbqWNOwNRna42FI242Lcia07jQodd2FJGIYQfG0LAJGFxM4FbnQP6yfMxBgJ0F3YRqJCJ1aPAK2dQagdusBZg/0'
 
@@ -61,7 +62,7 @@ Page({
     auth.wxLogin().then(code => {
       app.globalData.loginCode = code
     }).catch(err => {
-      console.warn('wx.login 失败（非阻塞）:', err)
+      util.logError('wx.login 失败（非阻塞）:', err)
     })
 
     wx.navigateTo({ url: '/pages/input/input' })

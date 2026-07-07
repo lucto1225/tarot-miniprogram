@@ -1,7 +1,7 @@
 // 78 张塔罗牌数据
 // 每张牌包含：id, name_zh, name_en, type(major/minor), arcana, suit, keywords, meaning_upright, meaning_reversed
 
-const cards = [
+var cards = [
   // ==================== 大阿卡纳 (Major Arcana) 0-21 ====================
   { id: 0, name_zh: '愚者', name_en: 'The Fool', type: 'major', arcana: 0, suit: null,
     keywords: ['开始', '冒险', '天真', ' spontaneity'],

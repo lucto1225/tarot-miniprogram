@@ -18,17 +18,13 @@ App({
     }
   },
 
-  onLaunch() {
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
-
+  onLaunch: function() {
     wx.login({
-      success: res => {
+      success: function(res) {
         if (res.code) {
           this.globalData.loginCode = res.code
         }
-      }
+      }.bind(this)
     })
   }
 })

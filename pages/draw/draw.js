@@ -65,8 +65,10 @@ Page({
     if (card.selected) return
     if (this.data.selectedCards.length >= maxCount) return
 
-    allCards[index] = Object.assign({}, card, { selected: true })
-    var selectedCards = this.data.selectedCards.concat(card)
+    // 随机正逆位
+    var isReversed = Math.random() < 0.5
+    allCards[index] = Object.assign({}, card, { selected: true, reversed: isReversed })
+    var selectedCards = this.data.selectedCards.concat(Object.assign({}, card, { reversed: isReversed }))
 
     this.setData({ allCards: allCards, selectedCards: selectedCards })
 
@@ -74,7 +76,10 @@ Page({
 
     if (selectedCards.length === maxCount) {
       this.setData({ phase: 'done' })
-      app.globalData.reading.cards = selectedCards.map(function(c) { return c.id })
+      // 存储卡牌 id + 正逆位
+      app.globalData.reading.cards = selectedCards.map(function(c) {
+        return { id: c.id, reversed: c.reversed }
+      })
 
       var self = this
       setTimeout(function() {

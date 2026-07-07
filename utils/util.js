@@ -1,3 +1,20 @@
+// 仅开发环境输出日志，生产环境静默
+function isDev() {
+  try {
+    var account = wx.getAccountInfoSync()
+    return account.miniProgram.envVersion === 'develop'
+  } catch (e) {
+    return false
+  }
+}
+
+function log() {
+  if (isDev()) { console.log.apply(console, arguments) }
+}
+function logError() {
+  if (isDev()) { console.error.apply(console, arguments) }
+}
+
 var formatTime = function(date) {
   var year = date.getFullYear()
   var month = date.getMonth() + 1
@@ -52,5 +69,7 @@ function markdownToHtml(md) {
 
 module.exports = {
   formatTime: formatTime,
-  markdownToHtml: markdownToHtml
+  markdownToHtml: markdownToHtml,
+  log: log,
+  logError: logError
 }
