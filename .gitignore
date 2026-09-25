@@ -45,7 +45,6 @@ prisma/*.db-journal
 
 # claude
 .claude/*
-!.claude/skills/
 
 # WeChat miniprogram
 miniprogram_npm/
